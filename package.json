@@ -4,6 +4,10 @@
   "description": "A minigame bot based on coin system",
   "main": "bot.js",
   "type": "module",
+  "engines": {
+    "node": "16.x",
+    "npm": "7.x"
+  },
   "scripts": {
     "start": "bot.js"
   },
