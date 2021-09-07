@@ -44,16 +44,7 @@ client.on('messageCreate', async (msg) => {
             const nextRewardDate = mapUserMoney.get(msg.author.id).nextRewardDate;
             console.log(nextRewardDate);
             console.log(moment());
-            let remainingTime = moment(nextRewardDate - moment());
-            let remainingHours;
-
-            if(remainingTime.get('hours') == 0 && remainingTime.get('day') > 0){
-                remainingHours = 23;
-            }
-
-            // .format('H[ hour(s)] m[ minute(s)] s[ second(s) ago.]')
-            remainingTime = remainingHours + remainingTime.format(" : m : s");
-
+            let remainingTime = moment(nextRewardDate - moment()).format('D[ hours(s)] m[ minute(s)] s[ second(s) ago.]');
 
             originChannel.send({ content: "Your next reward will be in "  + remainingTime, reply: { messageReference: msg.id }})
         }
