@@ -28,6 +28,12 @@ client.on('ready', () => {
     //guilds[0].members.fetch().then((data) => console.log(data));
 })
 
+client.on('guildMemberAdd', (member) => {
+    if(!mapUserMoney.has(member.id)){
+        mapUserMoney.set(member.user.id, {money: 0, nextRewardDate: moment()});
+    }
+});
+
 client.on('messageCreate', async (msg) => {
 
     const originChannel = client.channels.cache.get(msg.channelId);
