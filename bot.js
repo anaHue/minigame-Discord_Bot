@@ -37,13 +37,13 @@ client.on('messageCreate', async (msg) => {
     if(args[0] == "!daily"){
         if(moment().isAfter(mapUserMoney.get(msg.author.id).nextRewardDate)){
             mapUserMoney.get(msg.author.id).money += 100;
-            mapUserMoney.get(msg.author.id).nextRewardDate = moment(new Date()).add(23, 'hours');
+            mapUserMoney.get(msg.author.id).nextRewardDate = moment(new Date()).add(23, 'hours').add(59, "minutes").add(59, 'seconds');
             originChannel.send({ content: "You received 100 coins !", reply: { messageReference: msg.id }})
             console.log(mapUserMoney)
         } else{
             const nextRewardDate = mapUserMoney.get(msg.author.id).nextRewardDate;
             console.log(nextRewardDate);
-            let remainingTime = moment(nextRewardDate - moment()).format(`H [ hours(s)] m[ minute(s)] s[ second(s) ago.]`);
+            let remainingTime = moment(nextRewardDate - moment()).format(`H [hours(s)] m[ minute(s)] s[ second(s) ago.]`);
 
             originChannel.send({ content: "Your next reward will be in "  + remainingTime, reply: { messageReference: msg.id }})
         }
