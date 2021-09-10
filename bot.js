@@ -10,6 +10,8 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 let mapUserMoney = new Map();
 let hangmanGames = new Map();
 
+// client.user.setUsername
+
 client.on('ready', () => {
     const guilds = client.guilds.cache.toJSON();
     let members;
@@ -18,7 +20,7 @@ client.on('ready', () => {
         members = members.toJSON();
         members.forEach((member) => {
             if(!mapUserMoney.has(member.user.id) && !member.user.bot){
-                mapUserMoney.set(member.user.id, {money: 0, nextRewardDate: moment()});
+                mapUserMoney.set(member.user.id, {money: 0, nextRewardDate: 0});
             }
         });
 
@@ -30,7 +32,7 @@ client.on('ready', () => {
 
 client.on('guildMemberAdd', (member) => {
     if(!mapUserMoney.has(member.id)){
-        mapUserMoney.set(member.user.id, {money: 0, nextRewardDate: moment()});
+        mapUserMoney.set(member.user.id, {money: 0, nextRewardDate: 0});
     }
 });
 
@@ -41,15 +43,13 @@ client.on('messageCreate', async (msg) => {
     const args = msg.content.split(' ');
 
     if(args[0] == "!daily"){
-        if(moment().isAfter(mapUserMoney.get(msg.author.id).nextRewardDate)){
+        if(mapUserMoney.get(msg.author.id).nextRewardDate == 0){
             mapUserMoney.get(msg.author.id).money += 100;
-            mapUserMoney.get(msg.author.id).nextRewardDate = moment(new Date()).add(23, 'hours').add(59, "minutes").add(59, 'seconds');
+            mapUserMoney.get(msg.author.id).nextRewardDate = 86400;
             originChannel.send({ content: "You received 100 coins !", reply: { messageReference: msg.id }})
-            console.log(mapUserMoney)
+            console.log(mapUserMoney);
         } else{
             const nextRewardDate = mapUserMoney.get(msg.author.id).nextRewardDate;
-            console.log(nextRewardDate);
-            let remainingTime = moment(nextRewardDate - moment()).format(`H [hours(s)] m[ minute(s)] s[ second(s) ago.]`);
 
             originChannel.send({ content: "Your next reward will be in "  + remainingTime, reply: { messageReference: msg.id }})
         }
@@ -69,7 +69,7 @@ client.on('messageCreate', async (msg) => {
     }
 
     if(args[0] == "!hangman"){
-        if(!hangmanGames.get(msg.author.username)){
+        if(!hangmanGames.get(msg.author.id)){
             let wordSolution;
 
             while(!wordSolution || wordSolution.length < 4){
@@ -83,9 +83,9 @@ client.on('messageCreate', async (msg) => {
 
             originChannel.send({ content: wordToGuess + ` in ${wordToGuess.length} letters (you have 10 attempts)`, reply: { messageReference: msg.id }});
         
-            hangmanGames.set(msg.author.username, {solution: wordSolution, lettersSent: new Set(), attemps: 10});
+            hangmanGames.set(msg.author.id, {solution: wordSolution, lettersSent: new Set(), attemps: 10});
 
-            console.log(hangmanGames.get(msg.author.username).solution);
+            console.log(hangmanGames.get(msg.author.id).solution);
         } else{
             if (!args[1]) {
                 originChannel.send({ content: `no letters / word given or you are in a not finished game`, reply: { messageReference: msg.id }});
@@ -122,5 +122,17 @@ client.on('messageCreate', async (msg) => {
         `);
     }
 });
+
+setInterval(
+    ()=>{
+        mapUserMoney.forEach((value, key) => {
+            if(value.nextRewardDate > 0){
+                value.nextRewardDate--;
+                mapUserMoney.set(key, value)
+            }
+        });
+    }
+    ,1000
+);
 
 client.login(process.env.TOKEN);
