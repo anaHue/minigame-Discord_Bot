@@ -49,7 +49,12 @@ client.on('messageCreate', async (msg) => {
             originChannel.send({ content: "You received 100 coins !", reply: { messageReference: msg.id }})
             console.log(mapUserMoney);
         } else{
-            const nextRewardDate = mapUserMoney.get(msg.author.id).nextRewardDate;
+            const duration = mapUserMoney.get(msg.author.id).nextRewardDate;
+            const hrs = ~~(duration / 3600);
+            const mins = ~~((duration % 3600) / 60);
+            const secs = ~~duration % 60;
+
+            const remainingTime = hrs + ":" + mins + ":" + secs;
 
             originChannel.send({ content: "Your next reward will be in "  + remainingTime, reply: { messageReference: msg.id }})
         }
